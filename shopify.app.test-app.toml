@@ -1,0 +1,24 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "589f9990d9f90b3fdf4c32c88baee368"
+name = "test-app"
+handle = "test-app-8803"
+application_url = "https://example.com"
+embedded = true
+
+[build]
+dev_store_url = "quickstart-d00a0bd3.myshopify.com"
+include_config_on_deploy = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_checkouts,read_draft_orders,read_files,read_orders,read_price_rules,read_returns,write_checkouts,write_draft_orders,write_files,write_orders,write_price_rules,write_products,write_returns"
+
+[auth]
+redirect_urls = [ "https://example.com" ]
+
+[webhooks]
+api_version = "2024-01"
+
+[pos]
+embedded = false
