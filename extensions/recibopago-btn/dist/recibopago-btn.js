@@ -1133,7 +1133,7 @@
             }
             return dispatcher.useContext(Context);
           }
-          function useState(initialState) {
+          function useState2(initialState) {
             var dispatcher = resolveDispatcher();
             return dispatcher.useState(initialState);
           }
@@ -1936,7 +1936,7 @@
           exports.useMemo = useMemo2;
           exports.useReducer = useReducer;
           exports.useRef = useRef2;
-          exports.useState = useState;
+          exports.useState = useState2;
           exports.useSyncExternalStore = useSyncExternalStore;
           exports.useTransition = useTransition;
           exports.version = ReactVersion;
@@ -2430,9 +2430,9 @@
         module.exports = function $$$reconciler($$$hostConfig) {
           var exports2 = {};
           "use strict";
-          var React2 = require_react();
+          var React = require_react();
           var Scheduler = require_scheduler();
-          var ReactSharedInternals = React2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           var suppressWarning = false;
           function setSuppressWarning(newSuppressWarning) {
             {
@@ -6230,7 +6230,7 @@
             }
           }
           var fakeInternalInstance = {};
-          var emptyRefsObject = new React2.Component().refs;
+          var emptyRefsObject = new React.Component().refs;
           var didWarnAboutStateAssignmentForComponent;
           var didWarnAboutUninitializedState;
           var didWarnAboutGetSnapshotBeforeUpdateWithoutDidUpdate;
@@ -17541,7 +17541,7 @@
       if (true) {
         (function() {
           "use strict";
-          var React2 = require_react();
+          var React = require_react();
           var REACT_ELEMENT_TYPE = Symbol.for("react.element");
           var REACT_PORTAL_TYPE = Symbol.for("react.portal");
           var REACT_FRAGMENT_TYPE = Symbol.for("react.fragment");
@@ -17567,7 +17567,7 @@
             }
             return null;
           }
-          var ReactSharedInternals = React2.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
+          var ReactSharedInternals = React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED;
           function error(format) {
             {
               {
@@ -18438,6 +18438,9 @@
       }
     }
   });
+
+  // extensions/recibopago-btn/src/Checkout.jsx
+  var import_react11 = __toESM(require_react());
 
   // node_modules/@remote-ui/rpc/build/esm/memory.mjs
   function isBasicObject(value) {
@@ -19500,36 +19503,41 @@ ${errorInfo.componentStack}`);
   }
 
   // extensions/recibopago-btn/src/Checkout.jsx
-  var import_react11 = __toESM(require_react());
   var import_jsx_runtime4 = __toESM(require_jsx_runtime());
   var Checkout_default = reactExtension(
     "purchase.thank-you.block.render",
     () => /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Extension, {})
   );
-  function PostRequest(param) {
-    fetch("https://6673b1d675872d0e0a9349af.mockapi.io/api/shopify", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(param)
-    }).then(() => {
-      console.log("data sent");
-    });
-  }
   function Extension() {
-    const api = useApi();
-    var data = {
-      "amount": api.cost.totalAmount.current.amount,
-      "currency": api.cost.totalAmount.current.currencyCode,
-      "email": api.buyerIdentity.email.current,
-      "order-id": api.orderConfirmation.current.order.id
+    const { query, orderConfirmation, buyerIdentity, cost } = useApi();
+    const [data, setData] = (0, import_react11.useState)();
+    let regex = /\D/g;
+    let orderId = orderConfirmation.current.order.id;
+    let orderId2 = orderId.replace(regex, "");
+    const getOrder = () => {
+      query(
+        `query ($orderId: ID!) {
+        node(id: $orderId) {
+          ... on Order {
+            id
+            name
+            financialStatus
+          }
+        }
+      }`,
+        {
+          //variable con formato de id necesario para acceder a la orden
+          variables: { orderId: "gid://shopify/Order/" + orderId2 }
+        }
+      ).then(({ data: data2, errors }) => setData(data2)).catch(console.error);
     };
     return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(InlineStack2, { children: /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
       Button2,
       {
         onPress: () => {
-          PostRequest(data);
+          getOrder();
         },
-        children: "Pagar con ReciboPagos"
+        children: "Datos de Orden"
       }
     ) });
   }
